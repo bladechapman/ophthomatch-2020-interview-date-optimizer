@@ -106,7 +106,7 @@ def buildDatesToSinkEdges():
         UNIT_COSTS += [0]
 
 
-def buildSinkConstraint(c=20):
+def buildSinkConstraint(c=50):
     global START_NODES
     global END_NODES
     global CAPACITIES
@@ -129,10 +129,12 @@ def optimize():
             UNIT_COSTS[i]
         )
 
-    min_cost_flow.SetNodeSupply(SOURCE_NODE_INDEX, 20)
-    min_cost_flow.SetNodeSupply(SINK_NODE_INDEX, -20)
+    min_cost_flow.SetNodeSupply(SOURCE_NODE_INDEX, 100)
+    min_cost_flow.SetNodeSupply(SINK_NODE_INDEX, -100)
 
-    if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
+    s = min_cost_flow.SolveMaxFlowWithMinCost()
+
+    if s == min_cost_flow.OPTIMAL:
         for i in range(min_cost_flow.NumArcs()):
             schoolNode = min_cost_flow.Tail(i)
             dateNode = min_cost_flow.Head(i)
@@ -143,10 +145,11 @@ def optimize():
                     and flow == 1):
                 schoolName = nodeSchoolMapping[schoolNode]
                 date = nodeDateMapping[dateNode]
-                print(date + ": " + schoolName)
+                print("%7s | %s" % (date, schoolName))
 
     else:
         print('There was an issue with the min cost flow input.')
+        print(s)
 
 
 if __name__ == "__main__":
